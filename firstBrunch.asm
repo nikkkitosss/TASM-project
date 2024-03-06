@@ -1,0 +1,2 @@
+start:
+xor ax , ax 
