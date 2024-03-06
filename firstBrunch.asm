@@ -1,2 +1,3 @@
 start:
-xor ax , ax 
+xor ax , ax ; clean
+
