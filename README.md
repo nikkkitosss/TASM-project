@@ -1,2 +1,2 @@
 # TASM-project
-Variant 3;
+Zahorui Nikita Variant 3;
