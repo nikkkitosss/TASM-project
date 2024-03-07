@@ -1,2 +1,1 @@
-start:
-mov ax , 1 
+mov ax, 0 
