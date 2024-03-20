@@ -20,7 +20,7 @@ read_loop:
     mov ah, 0Ah             ; зчитати рядок з stdin
     int 21h
 
-    ; перевірка на EOF
+    ; перевірка на EOF  
     cmp buffer, '$'
     je end_input
 
