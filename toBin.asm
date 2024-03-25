@@ -1,82 +1,42 @@
 .model small
 .stack 100h
+
 .data
-    countOne db ?
-    countZero db ?
-    nln db 0ah,0dh,'$'
+    decimal dw -213          ; Задане десяткове число (від'ємне)
+    binary db 17 dup(?)      ; Буфер для бінарного представлення числа (з одним додатковим бітом для знаку)
+
 .code
-     main proc
-     
-     mov ax,@data
-     mov ds,ax
-     
-     mov countOne,30h
-     mov countZero,30h
-     
-     mov ah,
-     int 21h
-     mov bl,al
-     
-     
-     cmp bl,65
-     jge hex
-     
-     sub bl,48
-     jmp doit
-     
-     hex:
-     sub bl,55
-     
-     doit:
-     mov ah,9
-     lea dx, nln
-     int 21h
-     
-     mov cl,0
-             
-     rotate:        
-     rol bl,1
-     
-     jnc zero
-     jc one
-     
-     zero:
-     inc countZero
-     
-     cmp cl,4
-     jl do1
-     
-     mov ah,2
-     mov dl,'0'
-     int 21h
-     
-     do1:
-     jmp looper
-     
-     one:
-     inc countOne
-     
-     cmp cl,4
-     
-     jl do2
-     mov ah,2
-     mov dl,'1'
-     int 21h
-     do2:
-     jmp looper
-     
-     
-     looper:
-     inc cl
-     cmp cl,8
-     jl rotate
-     
-     
-     finish:
-     mov ah,9
-     lea dx,nln
-     int 21h
+main:
+    mov ax, @data
+    mov ds, ax
 
+    mov ax, decimal          ; Завантаження десяткового числа в регістр AX
 
-    main endp
+    mov bx, offset binary    ; Початкова адреса буфера для бінарного представлення
+
+    mov cx, 17               ; Кількість біт в двійковому числі (з одним додатковим бітом для знаку)
+
+convert_loop:
+    shl ax, 1                ; Зсув числа вліво на один біт
+    jc set_bit               ; Перевірка, чи нижній біт дорівнює 1
+    mov byte ptr [bx], '0'   ; Якщо ні, встановлюємо значення '0'
+    jmp next_bit
+
+set_bit:
+    mov byte ptr [bx], '1'   ; Якщо так, встановлюємо значення '1'
+
+next_bit:
+    inc bx                   ; Перехід до наступного байта буфера
+    loop convert_loop        ; Повторення циклу, поки не буде оброблено 17 біт (включаючи біт знака)
+
+    mov si, offset binary    ; Завершення рядка бінарного числа
+    add si, 17               ; Додаємо 17, щоб вказувати на кінець буфера
+    mov byte ptr [si], '$'   ; Кінець рядка
+
+    mov ah, 9                ; Функція DOS для виводу рядка
+    mov dx, offset binary    ; Завантаження адреси рядка для виводу
+    int 21h
+
+    mov ax, 4C00h            ; Завершення програми DOS
+    int 21h
 end main
